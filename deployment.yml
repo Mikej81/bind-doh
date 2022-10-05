@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bind-doh-dep
+  labels:
+    app: bind
+  annotations:
+    ves.io/sites: system/coleman-azure,system/coleman-cluster-100,system/colemantest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bind
+  template:
+    metadata:
+      labels:
+        app: bind
+    spec:
+      containers:
+      - name: bind
+        image: mcoleman81/bind-doh
+        env:
+        - name: DOCKER_LOGS
+          value: "1"
+        - name: ALLOW_QUERY
+          value: "any"
+        - name: ALLOW_RECURSION
+          value: "any"
+        - name: DNS_FORWARDER
+          value: "8.8.8.8, 8.8.4.4"
+        - name: DNS_A
+          value: domain1.com=68.183.126.197,domain2.com=68.183.126.197
+        ports:
+        - containerPort: 5553
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /etc/nginx
+          readOnly: true
+          name: nginx-conf
+        - mountPath: /var/log/nginx
+          name: log
+        - mountPath: /etc/ssl/certs
+          name: nginx-cert
+        - mountPath: /etc/ssl/private
+          name: nginx-key
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-conf
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+      - name: nginx-cert
+        configMap:
+          name: nginx-conf
+          items:
+            - key: dns.pem
+              path: dns.pem
+      - name: nginx-key
+        configMap:
+          name: nginx-conf
+          items:
+            - key: dns.key
+              path: dns.key
+      - name: log
+        emptyDir: {}

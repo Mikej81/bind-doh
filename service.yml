@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bind-services
+  annotations:
+    ves.io/sites: system/coleman-azure
+spec:
+  type: ClusterIP
+  selector:
+    app: bind
+  ports:
+    - name: dns-udp
+      port: 53
+      targetPort: 5553
+      protocol: UDP
+    - name: dns-tcp
+      port: 53
+      targetPort: 5353
+      protocol: TCP
+    - name: dns-http
+      port: 80
+      targetPort: 8888
+      protocol: TCP
+    - name: nginx-http-listener
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: nginx-https-listener
+      port: 4443
+      targetPort: 4443
+      protocol: TCP
