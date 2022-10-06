@@ -166,7 +166,7 @@ spec:
         - name: DNS_A
           value: domain1.com=68.183.126.197,domain2.com=68.183.126.197
         ports:
-        - containerPort: 5553
+        - containerPort: 53
       - name: nginx
         image: nginx
         ports:
@@ -220,7 +220,7 @@ spec:
       protocol: UDP
     - name: dns-tcp
       port: 53
-      targetPort: 5353
+      targetPort: 5553
       protocol: TCP
     - name: dns-http
       port: 80
